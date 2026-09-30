@@ -1,0 +1,63 @@
+
+======================================================================
+COMPONENT 1: Supervised classification (known fraud patterns)
+======================================================================
+              precision    recall  f1-score   support
+
+  legitimate       1.00      0.98      0.99      5910
+       fraud       0.49      0.89      0.63       108
+
+    accuracy                           0.98      6018
+   macro avg       0.75      0.94      0.81      6018
+weighted avg       0.99      0.98      0.98      6018
+
+ROC-AUC: 0.9886
+
+Top feature importances:
+amount                    0.483771
+amount_vs_avg_activity    0.268538
+is_peer_transfer          0.114702
+hour_of_day               0.060201
+channel_encoded           0.036508
+is_night                  0.036279
+
+======================================================================
+COMPONENT 2: Unsupervised anomaly detection (unseen patterns)
+======================================================================
+Transactions flagged as anomalous: 402 (2.00% of total)
+Share of flagged transactions that match the synthetic fraud ground truth: 42.79%
+(Unsupervised detection is expected to also surface novel patterns not present
+ in the labeled ground truth -- that is its intended purpose.)
+
+======================================================================
+COMPONENT 3: Network/graph analysis (account-to-account layering)
+======================================================================
+Graph built from peer-to-peer transfers: 500 accounts, 4881 transfer edges
+
+Top 10 accounts by connectivity (degree centrality) --
+high connectivity within a tight, mutually-reinforcing cluster is a
+pattern consistent with structuring/layering and warrants AML review:
+  ACC100234: centrality=0.0842, in-degree=18, out-degree=24
+  ACC100098: centrality=0.0621, in-degree=13, out-degree=18
+  ACC100010: centrality=0.0621, in-degree=16, out-degree=15
+  ACC100259: centrality=0.0621, in-degree=17, out-degree=14
+  ACC100146: centrality=0.0621, in-degree=15, out-degree=16
+  ACC100413: centrality=0.0621, in-degree=19, out-degree=12
+  ACC100174: centrality=0.0621, in-degree=13, out-degree=18
+  ACC100356: centrality=0.0601, in-degree=20, out-degree=10
+  ACC100308: centrality=0.0601, in-degree=14, out-degree=16
+  ACC100468: centrality=0.0601, in-degree=18, out-degree=12
+
+Detected 21 account communities via modularity-based clustering;
+3 of them are small and densely interconnected (density >= 0.25),
+a pattern consistent with structuring/layering that would be flagged for manual AML
+review in the proposed production design:
+  cluster of 7 accounts, internal density=0.81: ['ACC100104', 'ACC100187', 'ACC100234', 'ACC100308', 'ACC100312', 'ACC100371', 'ACC100447']
+  cluster of 7 accounts, internal density=0.38: ['ACC100003', 'ACC100073', 'ACC100134', 'ACC100230', 'ACC100333', 'ACC100373', 'ACC100397']
+  cluster of 5 accounts, internal density=0.40: ['ACC100138', 'ACC100220', 'ACC100356', 'ACC100379', 'ACC100392']
+
+======================================================================
+Prototype run complete. See README.md for architecture notes and
+how each component maps to the production design described in the
+petitioner's Model or Business Plan.
+======================================================================
